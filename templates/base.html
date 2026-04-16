@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru" data-bs-theme="dark">
+
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
+    </style>
+    <link rel="icon" type="image/png" href="/static/nexus_logo.png">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Сначала Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <!-- Потом ваши стили -->
+    <link rel="stylesheet" href="/static/style.css?v=2">
+</head>
+
+<body>
+    <div class="modal fade position-absolute" id="postsModal" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" {% if show_modal %} data-bs-show="true"
+        {% endif %}>
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 15px; background: rgba(10, 10, 20, 0.75);">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 font" id="staticBackdropLabel">Создать новый пост</h1><button
+                        data-bs-dismiss="modal" type="button" class="btn-unstyled">✕</button>
+                </div>
+                <div class="d-flex flex-column gap-1 m-1">
+                    <a class="btn-glass btn-glass-outline font"
+                        href="{{ url_for('add_post', post_type='server_java') }}"><img src="/static/serverjava.svg">Java
+                        сервер</a>
+                    <a class="btn-glass btn-glass-outline font"
+                        href="{{ url_for('add_post', post_type='server_bedrock') }}"><img
+                            src="/static/serverbedrock.svg ">Bedrock сервер</a>
+                    <a class="btn-glass btn-glass-outline font"
+                        href="{{ url_for('add_post', post_type='texture_pack') }}"><img
+                            src="/static/texture.svg">Текстур пак</a>
+                    <a class="btn-glass btn-glass-outline font"
+                        href="{{ url_for('add_post', post_type='article') }}"><img src="/static/article.svg">Статья</a>
+                    <a class="btn-glass btn-glass-outline font" href="/add_discuss"><img src="/static/forum.png">Ветка
+                        на форуме</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="glass-header fixed-top mx-2 my-2"
+        style="height: 68px; border-radius: 15px; max-width: 100vw; width: auto;">
+        <nav class="navbar navbar-expand-lg h-100 p-0">
+            <a class="navbar-brand d-flex align-items-center justify-content-center p-0 m-0 ms-md-3 ms-4" href="/">
+                <img src="/static/nexus_logo.png" height="50">
+                <img src="/static/nexus_title.png" height="30" ondrag="playSound()">
+            </a>
+            <div class="d-flex align-items-center">
+                <ul class="navbar-nav d-none d-md-flex flex-row">
+                    <li class="nav-item">
+                        <a href="/forum" class="nav-link-glass d-flex align-items-center font ms-2"
+                            style="height: 48px;" title="Форум">
+                            <img src="/static/forum.png" style="margin-right: 5px; height: 18px;">
+                            Форум
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="/news" class="nav-link-glass d-flex align-items-center font" style="height: 48px;"
+                            role="button" title="Новости" data-bs-toggle="dropdown" data-bs-auto-close="false"
+                            aria-expanded="false">
+                            <img src="/static/news.png" style="margin-right: 5px; height: 18px;">
+                            Новости
+                            <span class="nav-indicator"></span>
+                        </a>
+
+                        <ul class="dropdown-menu" style="width: 280px; min-width: 250px;">
+                            <span class="font ms-3">Выберите тип новостей:</span>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/news_nexus">Nexus</a></li>
+                            <li><a class="dropdown-item" href="/light_theme">Minecraft</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/servers" class="nav-link-glass d-flex align-items-center font" title="Сервера"
+                            style="height: 48px;">
+                            <img src="/static/server.svg" style="margin-right: 5px; height: 18px;">
+                            Сервера
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="d-flex flex-row gap-3 ms-auto align-items-center me-3">
+                <!-- Поиск -->
+                <div class="search-glass d-flex align-items-center font" style="height: 44px; width: 250px;">
+                    <img src="/static/search.svg" style="margin-left: 10px; margin-right: 5px; height: 18px;">
+                    <input type="text" placeholder="Поиск..."
+                        style="height: 100%; background: transparent; border: none; color: white; outline: none; width: 100%;"
+                        title="Поиск">
+                </div>
+                {% if current_user.is_authenticated %}
+                {% if current_user.is_moderator %}
+                <a href="/moderate_posts" class="btn-glass btn-glass-outline font p-0" style="
+                        width: 44px;
+                        height: 44px;
+                        background-image: url(/static/moderate.svg);
+                        background-size: 20px;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        border-radius: 50%;" title="Модерация постов">
+                </a>
+                {% endif %}
+                <a data-bs-toggle="modal" data-bs-target="#postsModal" class="btn-glass btn-glass-outline font p-0
+                    dropdown" style="
+                        width: 44px;
+                        height: 44px;
+                        background-image: url(/static/add.svg);
+                        background-size: 20px;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        border-radius: 50%;" title="Добавить пост">
+                </a>
+                <div class="vr my-2"></div>
+                <li class="nav-item dropdown position-relative" style="overflow: visible;">
+                    <button class="btn-glass btn-glass-outline font p-0" data-bs-toggle="dropdown"
+                        data-bs-auto-close="false" aria-expanded="false" title="Уведомления" id="notificationDropdown"
+                        style="width: 44px; height: 44px; background-image: url(/static/notice.svg); background-size: 20px; background-repeat: no-repeat; background-position: center; border-radius: 50%;">
+                    </button>
+                    {% if notifications_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="z-index: 1000;">
+                        {{ notifications_count }}
+                    </span>
+                    {% endif %}
+                    <ul class="dropdown-menu dropdown-menu-end" style="width: 320px;">
+                        <li><span class="font ms-3">Последние уведомления ({{ notifications_count }})</span></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        {% if notifications %}
+                        {% for notification in notifications %}
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                {{ notification.author.username if notification.author else 'Неизвестно' }} {{
+                                notification.message }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                        {% else %}
+                        <li><span class="dropdown-item text-secondary">Нет новых уведомлений</span></li>
+                        {% endif %}
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li class="text-center">
+                            <a class="dropdown-item text-center" href="/notifications">Все уведомления</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <div class="dropdown my-2">
+                    {% if user.avatar %}
+                    <button class="btn-glass btn-glass-outline font p-0" style="
+                        width: 44px;
+                        height: 44px;
+                        background-image: url(/static/avatars/{{ user.avatar }});
+                        background-size: cover;
+                        background-position: center;
+                        border-radius: 50%;" type="button" data-bs-toggle="dropdown" data-bs-auto-close="false"
+                        href="#profile" title="Ваш профиль">
+                    </button>
+                    {% else %}
+                    <button
+                        class="btn-glass btn-glass-outline font p-0 d-flex align-items-center justify-content-center"
+                        style="
+                        width: 44px;
+                        height: 44px;
+                        background: linear-gradient(145deg, rgba(111, 66, 193, 0.9), rgba(168, 85, 247, 0.9));
+                        border-radius: 50%;" type="button" data-bs-toggle="dropdown" data-bs-auto-close="false"
+                        href="#profile" title="Ваш профиль">
+                        {{ current_user.username[0]|upper }}
+                    </button>
+                    {% endif %}
+                    <div class="w-100">
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <a class="font ms-3 text-decoration-none text-reset">{{ current_user.username }}</a>
+                            <span class="ms-3 badge text-bg-secondary">Уровень: 0</span>
+                            <hr>
+                            <li><a class="dropdown-item" href="/user/{{ user.id }}">Ваш аккаунт</a></li>
+                            <li><a class="dropdown-item" href="/light_theme">Светлая тема</a></li>
+                            <hr>
+                            <li><a class="dropdown-item" href="/logout">Выйти</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <a class="btn-glass btn-glass-outline font p-0" style="
+                        width: 44px;
+                        height: 44px;
+                        background-image: url(/static/login.svg);
+                        background-size: 20px;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        border-radius: 50%;" href="/login" title="Войти">
+                </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <button id="toggleSidebarBtn">☰</button>
+
+    <aside style="
+    position: fixed;
+    bottom: 0.5rem;
+    top: 5rem;
+    left: 0.5rem;
+    width: 100px;
+    background: rgba(10, 10, 20, 0.75);
+    backdrop-filter: blur(15px);
+    border-radius: 15px 0 15px   15px;
+    overflow-y: auto;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;" id="sidebar">
+
+        <!-- Верхняя часть с ссылками (занимает всё свободное место) -->
+        <div>
+            <div class="dropdown my-2">
+                <button
+                    class="btn-glass btn-glass-primary dropdown-toggle font mx-auto d-flex align-items-center justify-content-center"
+                    style="width: 10rem;" type="button" data-bs-toggle="collapse" href="#categories">
+                    Категории
+                </button>
+                <ul class="collapse mt-3 mx-auto" id="categories">
+                    <li><a class="dropdown-item" href="#">Строительство</a></li>
+                    <li><a class="dropdown-item" href="#">PvP</a></li>
+                    <li><a class="dropdown-item" href="#">Редстоун</a></li>
+                    <li><a class="dropdown-item" href="#">Челленджи</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown my-2">
+                <button
+                    class="btn-glass btn-glass-outline dropdown-toggle font mx-auto d-flex align-items-center justify-content-center"
+                    style="width: 10rem;" type="button" data-bs-toggle="collapse" href="#tutors">
+                    Туториалы
+                </button>
+                <ul class="collapse mt-3 mx-auto" id="tutors">
+                    <li><a class="dropdown-item" href="#">Моддинг</a></li>
+                    <li><a class="dropdown-item" href="#">Датапаки</a></li>
+                    <li><a class="dropdown-item" href="#">Ресурспаки</a></li>
+                    <li><a class="dropdown-item" href="#">Плагины</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown my-2">
+                <button
+                    class="btn-glass btn-glass-primary dropdown-toggle font mx-auto d-flex align-items-center justify-content-center"
+                    style="width: 10rem;" type="button" data-bs-toggle="collapse" href="#teories">
+                    Теории
+                </button>
+                <ul class="collapse mt-3 mx-auto" id="teories">
+                    <li><a class="dropdown-item" href="#">Звуки</a></li>
+                    <li><a class="dropdown-item" href="#">Мобы</a></li>
+                    <li><a class="dropdown-item" href="#">Постройки</a></li>
+                    <li><a class="dropdown-item" href="#">???</a></li>
+                </ul>
+            </div>
+            {% if current_user.is_banned %}
+            <a>Вы забанены!</a>
+            {% endif %}
+        </div>
+    </aside>
+
+
+    <main>
+        {% block main %}
+        {% endblock %}
+    </main>
+
+    <footer style="
+        border-top: 1px solid rgba(111, 66, 193, 0.3);
+        background: rgba(10, 10, 20, 0.9);
+        padding-top: 15px;
+        padding-bottom: 15px;
+    " class="mt-5 d-flex">
+        <div>
+            <a style="text-decoration: none; color: rgba(255,255,255,0.7);" class="fw-bold">Основное</a>
+            <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+                <a href="/" style="text-decoration: none; color: rgba(255,255,255,0.7);">Главная</a>
+                <a href="/forum" style="text-decoration: none; color: rgba(255,255,255,0.7);">Форум</a>
+                <a href="/news" style="text-decoration: none; color: rgba(255,255,255,0.7);">Новости</a>
+            </div>
+        </div>
+
+        <div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <a href="#" style="text-decoration: none; color: rgba(255,255,255,0.7);">Подробнее</a>
+                <a href="#" style="text-decoration: none; color: rgba(255,255,255,0.7);">О нас</a>
+                <a href="#" style="text-decoration: none; color: rgba(255,255,255,0.7);">Поддержка</a>
+                <a href="#" style="text-decoration: none; color: rgba(255,255,255,0.7);">Разработчикам</a>
+                <a href="https://t.me/nexus_mcgg" style="text-decoration: none; color: rgba(255,255,255,0.7);">Наш
+                    телеграмм</a>
+                <a style="color: rgba(255,255,255,0.5);">© 2026 Nexus</a>
+                <a style="color: rgba(255,255,255,0.5);">Nexus MC не связан с Mojang Studios или Microsoft.
+                    Minecraft является торговой маркой Mojang Studios.
+                </a>
+            </div>
+        </div>
+    </footer>
+
+
+    <div style="
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: auto;
+    max-width: 90%;
+">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3 font" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

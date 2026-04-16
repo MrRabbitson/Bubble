@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Главная
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block menu %}
+{% endblock %}
+
+{% block main %}
+<main class="content">
+    <div class="container">
+        <div class="text-center d-flex justify-content-center">
+            <div class="main-page-content p-3">
+                <div>
+                    <h3 class="mt-4 font">Приветствуем вас на Nexus MC!</h3>
+                    <span class="font-mine mt-2">Nexus MC - это место, на котором игроки Minecraft деляться своими
+                        мыслями и творениями!<br>
+                        Вы можете обсудить с другими пользователями различные темы, добавлять посты, или просто
+                        общаться.</span>
+                    {%if current_user.is_authenticated%}
+                    {%else%}
+                    <div style="background-image: url(/static/img/background.png);
+                                    background-position: center;
+                                    background-size: 100%;
+                                    background-repeat: none;
+                                    border-radius: 15px;
+                                    padding: 15px;" class="text-start m-2">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <label class="my-2 font">Хотите оставлять комментарии, создавать посты и много чего
+                            другого?</label>
+                        <div class="d-flex gap-1">
+                            <a class="btn-glass btn-glass-primary font" href="/login">Вход</a>
+                            <a class="font btn-glass btn-glass-outline" href="/register">Регистрация</a>
+                        </div>
+                    </div>
+                    {%endif%}
+                    <h3 class="mt-4 font">Популярные посты:</h3>
+                    <div class="row g-3">
+                        {% if posts|length > 0 %}
+                        {% for post in posts %}
+                        {% if post.status == 'moderated' %}
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="{% if post.type == 'exclusive' %}ex-post{% else %}post{% endif %}">
+                                <!-- Картинка -->
+                                {% if post.image_name %}
+                                <a href="/post/{{ post.id }}" class="text-decoration-none">
+                                    <div style="width: 100%; height: 200px;">
+                                        <img src="{{ url_for('static', filename='uploads/' ~ post.image_name) }}"
+                                            alt="Post image"
+                                            style="width: 100%; height: 200px; object-fit: cover; object-position: center;">
+                                    </div>
+                                </a>
+                                {% else %}
+                                <!-- Серое заполнение, если нет картинки -->
+                                <a href="/post/{{ post.id }}" class="text-decoration-none">
+                                    <div style="
+                width: 100%;
+                height: 200px;
+                background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">
+                                        <span style="
+                    color: rgba(255,255,255,0.3);
+                    font-size: 1rem;
+                    font-family: 'Unbounded', sans-serif;
+                    opacity: 0.5;
+                    user-select: none;
+                    margin-left: 0.6rem;
+                ">NO IMAGE</span>
+                                    </div>
+                                </a>
+                                {% endif %}
+
+                                <!-- Контент -->
+                                <div style="padding: 15px; flex: 1; display: flex; flex-direction: column;">
+                                    <hr class="p-1">
+                                    <a style="color: white; font-family: 'Unbounded', sans-serif;"
+                                        class="fw-bold text-decoration-none fs-5 text-start" title="Заголовок"
+                                        href="/post/{{ post.id }}">{{
+                                        post.title }}</a>
+                                    <a style="font-family: 'Unbounded', sans-serif;" title="Тип поста"
+                                        class="fw-bold text-decoration-none fs-7 {% if post.type == 'exclusive' %}text-golden{% else %}text-secondary{% endif %} text-start">{%
+                                        if post.type == 'article' %}Статья{% elif post.type == 'server_java' %}Java
+                                        сервер{% elif post.type == 'server_bedrock' %}Bedrock сервер{% elif post.type ==
+                                        'texture_pack' %}Текстур пак{% elif post.type == 'exclusive' %}Эксклюзивный{%
+                                        else %}Неизвестный тип поста{% endif %}</a>
+                                    <div class="d-flex">
+                                        <a class="m-0 link-custom text-secondary font-small font-mine text-start"
+                                            href="/user/{{ post.author.id }}">
+                                            <img src="/static/avatars/{{ post.author.avatar }}" height="15" width="15"
+                                                style="border-radius: 50%; margin-bottom: 0;">
+                                            {{ post.author.username }}{%if post.author.username == 'Whyiok'%}<img
+                                                src="static/verified.svg" height="15" class="m-1">{%endif%} </a>
+                                        <a
+                                            class="m-0 text-decoration-none text-secondary font-small font-mine text-start">•
+                                            {{
+                                            time_ago(post.date) }}</a>
+                                    </div>
+                                    <div
+                                        class="d-flex flex-row gap-3 mt-auto {% if post.type == 'exclusive' %}bg-golden{% else %}bg-purple{% endif %} rounded-pill align-items-center p-2">
+                                        <span title="Просмотры" class="font-mine"><img src="/static/view.svg"
+                                                class="me-1 ms-2" height="20">{{
+                                            post.views }}</span>
+                                        <span title="Комментарии" class="font-mine"><img src="/static/comment.svg"
+                                                class="me-1" height="20">{{
+                                            comments_len }}</span>
+                                        <form class="like-form" data-id="{{ post.id }}" data-type="post">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn-unstyled button-custom" title="Нравится">
+                                                <img id="like-icon-{{ post.id }}"
+                                                    src="/static/{% if post.liked %}like_filled.svg{% else %}like.svg{% endif %}">
+                                            </button>
+                                            <span id="rating-{{ post.id }}" class="ms-2 mt-2 font-mine text-white">{{
+                                                post.rating }}</span>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% else %}
+                        <div class="nav col-auto mb-2 justify-content-center mb-md-0 p-2" style="margin-top: 80px;">
+                            <p class="display-5 fw-bold"
+                                style="background: linear-gradient(45deg, #6f42c1, #a855f7, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 4rem; user-select: none;">
+                                У нас пока нету постов :(</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</main>
+{% endblock %}
