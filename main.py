@@ -20,7 +20,7 @@ load_dotenv()
 # Конфиги
 
 app = Flask(__name__)  # Инициализация приложения
-app.secret_key = os.getenv('SECRET_KEY')
+app.secret_key = '123'
 manager = LoginManager(app)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(
     days=31)  # Длительность сессии
@@ -55,25 +55,21 @@ class User(db.Model, UserMixin):  # Пользователи
     description = db.Column(
         db.Text, default="Пользователь поленился и не добавил инфу о себе :[")
     email = db.Column(db.Text, unique=True)
-    edition = db.Column(db.String)
     hash_password = db.Column(db.String)
     avatar = db.Column(db.String)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     is_moderator = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
-    is_checked = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)
     is_frozen = db.Column(db.Boolean, default=False)
 
-    def __init__(self, username, email, hash_password, edition, is_moderator=None, is_admin=None, is_checked=None, is_banned=None, is_frozen=None, description=None):
+    def __init__(self, username, email, hash_password, is_moderator=None, is_admin=None, is_banned=None, is_frozen=None, description=None):
         self.username = username
         self.description = description or "Пользователь поленился и не добавил инфу о себе :["
         self.email = email
         self.hash_password = hash_password
-        self.edition = edition
         self.is_moderator = is_moderator or False
         self.is_admin = is_admin or False
-        self.is_checked = is_checked or False
         self.is_banned = is_banned or False
         self.is_frozen = is_frozen or False
 
@@ -81,13 +77,12 @@ class User(db.Model, UserMixin):  # Пользователи
         return f"ID: {self.id}, Username: {self.username}, Email: {self.email}"
 
 
-class Notification(db.Model):
+class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    discuss_id = db.Column(db.Integer, db.ForeignKey(
-        'discuss.id', name='fk_notification_discuss'))
+    message_id = db.Column(db.Integer, db.ForeignKey(
+        'message.id'))
     type = db.Column(db.String(50))
     message = db.Column(db.String(200))
     is_read = db.Column(db.Boolean, default=False)
@@ -118,111 +113,29 @@ class Email_cods(db.Model):  # Коды отправляемые на Email
         return f"ID: {self.id}, Username: {self.username}, Email: {self.email}"
 
 
-class Comments(db.Model):  # Комментарии
+class Messages(db.Model):  # Сообщения
     id = db.Column(db.Integer, primary_key=True)
-    id_author = db.Column(db.Integer)
-    id_post = db.Column(db.Integer)
-    id_comment = db.Column(db.Integer)
-    id_discuss = db.Column(db.Integer)
-    comment = db.Column(db.Text)
-    rating = db.Column(db.Integer, default=0)
+    id_sender = db.Column(db.Integer)
+    id_recipient = db.Column(db.Integer, nullable=True)
+    is_reply = db.Column(db.Boolean)
+    reply_message_id = db.Column(db.Integer, nullable=True)
+    text = db.Column(db.Text)
+    reactions = db.Column(db.JSON, nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, id_author, comment, id_comment=None, id_discuss=None, id_post=None):
-        self.id_author = id_author
-        self.id_post = id_post or ""
-        self.id_discuss = id_discuss or ""
-        self.id_comment = id_comment or ""
-        self.comment = comment
-
-
-class Likes(db.Model):  # Лайки
-    id = db.Column(db.Integer, primary_key=True)
-    id_author = db.Column(db.Integer, db.ForeignKey('user.id'))
-    id_post = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    id_discuss = db.Column(db.Integer, db.ForeignKey(
-        'discuss.id', name='fk_likes_discuss'))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    __table_args__ = (db.UniqueConstraint(
-        'id_author', 'id_post', 'id_discuss', name='uq_likes_author_post_discuss'),)
-
-    def __init__(self, id_author, id_post=None, id_discuss=None):
-        self.id_author = id_author
-        self.id_post = id_post
-        self.id_discuss = id_discuss
-
-
-class Dislikes(db.Model):  # Дизлайки
-    id = db.Column(db.Integer, primary_key=True)
-    id_author = db.Column(db.Integer, db.ForeignKey('user.id'))
-    id_post = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    id_discuss = db.Column(db.Integer, db.ForeignKey(
-        'discuss.id', name='fk_dislikes_discuss'))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    __table_args__ = (db.UniqueConstraint(
-        'id_author', 'id_post', name='uq_dislikes_author_post'),)
-
-    def __init__(self, id_author, id_post=None, id_discuss=None):
-        self.id_author = id_author
-        self.id_post = id_post or ''
-        self.id_discuss = id_discuss or ''
+    def __init__(self, id_sender, text, id_recipient=False, reply_message_id=False):
+        self.id_sender = id_sender
+        self.id_recipient = id_recipient
+        self.reply_message_id = reply_message_id or ""
+        self.text = Text
 
 
 class Views(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    discuss_id = db.Column(db.Integer, db.ForeignKey('discuss.id'))
+    message_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer, nullable=True)
     session_id = db.Column(db.String, nullable=True)
     viewed_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class Posts(db.Model):  # Посты
-    id = db.Column(db.Integer, primary_key=True)
-    id_author = db.Column(db.Integer)
-    title = db.Column(db.String)
-    text = db.Column(db.Text)
-    rating = db.Column(db.Integer, default=0)
-    views = db.Column(db.Integer, default=0)
-    status = db.Column(db.Integer, default='on_moderating')
-    type = db.Column(db.JSON, default=[])
-    image_name = db.Column(db.String)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-    is_news = db.Column(db.Boolean, default=False)
-    official = db.Column(db.Boolean, default=False)
-
-    def __init__(self, id_author, title, text, views, status, type, image_name, official=None, is_news=None):
-        self.id_author = id_author
-        self.title = title
-        self.text = text
-        self.views = views
-        self.status = status
-        self.type = type
-        self.image_name = image_name
-        self.is_news = is_news or False
-        self.official = official or False
-
-
-class Discuss(db.Model):  # Посты
-    id = db.Column(db.Integer, primary_key=True)
-    id_author = db.Column(db.Integer)
-    title = db.Column(db.String)
-    text = db.Column(db.Text)
-    rating = db.Column(db.Integer, default=0)
-    views = db.Column(db.Integer, default=0)
-    status = db.Column(db.Integer, default='on_moderating')
-    categories = db.Column(db.JSON, default=[])
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __init__(self, id_author, title, text, views, status, categories):
-        self.id_author = id_author
-        self.title = title
-        self.text = text
-        self.views = views
-        self.status = status
-        self.categories = categories
 
 
 # Для проверки файлов
@@ -377,7 +290,7 @@ def inject_user():
 
 @app.route('/')
 def index():
-    posts = Posts.query.order_by(Posts.views.desc()).all()
+    messages = Messages.query.get().all
     comments_len = 0
     if posts:
         for post in posts:
