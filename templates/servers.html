@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Форум
+{% endblock %}
+
+{% block menu %}
+<li class="nav-item">
+    <a href="/" class="nav-link-glass activated">
+        <img src="/static/home.png" style="margin-right: 5px">
+        Главная
+        <span class="nav-indicator"></span>
+    </a>
+</li>
+{% endblock %}
+
+{% block main %}
+<main style="margin-top: 25px;">
+    <!-- Аудио элемент -->
+    <audio id="clickSound" style="display: none;" preload="auto">
+        <source src="/static/sound.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        function playSound() {
+            const sound = document.getElementById('clickSound');
+            if (sound) {
+                sound.volume = 0.1;
+                sound.currentTime = 0; // перемотка в начало
+                sound.play().catch(error => {
+                    console.log("Звук не воспроизведен:", error);
+                    // Многие браузеры требуют взаимодействия
+                });
+            }
+        }
+    </script>
+
+    <!-- Категории -->
+    <div class="nav col-auto mb-2 justify-content-center mb-md-0 p-2" style="margin-top: 80px;">
+                        <a class="btn-glass btn-glass-outline font p-0 dropdown btn"
+                   style="
+                        position: absolute;
+                        right: 20px;
+                        top: 85px;
+                        width: 44px;
+                        height: 44px;
+                        background-image: url(/static/info.svg);
+                        background-size: 20px;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        border-radius: 50%;"
+
+                data-bs-toggle="popover" data-bs-title="Добавление сервера" data-bs-content="Для того, чтобы подать заявку на добавление сервера, зайдите в меню вашего профиля.">
+                </a>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 260px; padding: 0;"
+         class="mt-4">
+        {% if servers|length > 0 %}
+        {% for server in servers %}
+        <!-- Карточка без Bootstrap классов -->
+        <div class="card" style="
+        height: 10rem;
+        width: 110rem;
+        display: flex;
+        flex-direction: row;
+        background: rgba(10, 10, 20, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(111, 66, 193, 0.3);
+        border-radius: 15px;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+    ">
+            <!-- Картинка -->
+            {% if server.image_base64 %}
+            <div style="width: 200px; height: 200px;">
+                <img src="data:image/{{ server.image_type }};base64,{{ server.image_base64 }}"
+                     alt="Post image"
+                     style="width: 100%; height: 200px; object-fit: cover; object-position: left;">
+            </div>
+            {% else %}
+            <!-- Серое заполнение, если нет картинки -->
+            <div style="
+                width: 200px;
+                height: 200px;
+                background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-bottom: 1px solid rgba(111, 66, 193, 0.3);
+            ">
+                <span style="
+                    color: rgba(255,255,255,0.3);
+                    font-size: 2rem;
+                    font-family: 'Unbounded', sans-serif;
+                    opacity: 0.5;
+                    user-select: none;
+                    margin-left: 3rem;
+                ">NO IMAGE</span>
+            </div>
+            {% endif %}
+
+            <!-- Контент -->
+
+            <div style="padding: 15px; flex: 1; display: flex; flex-direction: column;">
+                <h5 style="color: white; margin: 0 0 10px 0; font-family: 'Unbounded', sans-serif;">{{ server.title
+                    }}</h5>
+                <p style="color: rgba(255,255,255,0.8); margin: 0 0 15px 0; font-family: 'Unbounded', sans-serif; flex: 1;                 overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        min-height: 100px;
+        -webkit-line-clamp: 10;  /* много строк, но обрежется */
+        -webkit-box-orient: vertical;
+        margin-bottom: 15px;">
+                    {{ server.text }}</p>
+                <a href="/server/{{ server.id }}" class="btn-glass btn-glass-primary font mb-3" style="display: flex; /* или block */ align-items: center; /* вертикальное центрирование */ justify-content: center; /* горизонтальное центрирование */
+       width: 100%;
+       padding: 10px;
+       margin-bottom: 10px; text-align: center;      /* дополнительно */">Просмотр</a>
+                <div class="display-flex gap-3">
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin: 0;" onclick="playSound()">{{
+                        server.date }}</p>
+                    {% if server.categories %}
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin: 0;">{{ server.categories|join(' /
+                        ') }}</p>{% if current_user.username == 'Whyiok' %}
+                    <form method="post" action="/delete_post/{{ server.id }}">
+                        <button type="submit">DEL</button>
+                    </form>
+                    {% endif %}
+                    {% else %}
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin: 0;">No categories!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="nav col-auto mb-2 justify-content-center mb-md-0 p-2" style="margin-top: 80px;">
+            <p class="display-5  fw-bold"
+               style="background: linear-gradient(45deg, #6f42c1, #a855f7, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 4rem; user-select: none;">
+                У нас пока нету серверов :(</p>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

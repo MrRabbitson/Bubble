@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Форум
+{% endblock %}
+
+{% block menu %}
+<li class="nav-item">
+  <a href="/" class="nav-link-glass activated">
+    <img src="/static/home.png" style="margin-right: 5px" />
+    Главная
+    <span class="nav-indicator"></span>
+  </a>
+</li>
+{% endblock %}
+
+{% block main %}
+<main class="content">
+  <div class="container">
+    <div id="posts-container"
+      class="d-flex flex-column gap-2 justify-content-center p-3 mx-auto main-page-content">
+      <div class="mb-4 d-flex justify-content-between w-100">
+        <span class="font-classic ms-2"
+          style="background: linear-gradient(45deg, #6f42c1, #a855f7, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2rem; user-select: none;">ФОРУМ</span>
+
+        <a class="btn-glass btn-glass-primary font" style="
+                      border-radius: 15px;" title="Запустить ветку" href="/add_discuss"><img src="/static/add.svg"
+            height="20px">Запустить
+          ветку
+        </a>
+      </div>
+
+      {% if discusses|length > 0 %}
+      {% for discuss in discusses %}
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true" {% if show_modal %} data-bs-show="true" {% endif %}>
+        <div class="modal-dialog">
+          <div class="modal-content" style="border-radius: 15px; background: rgba(10, 10, 20, 0.75);">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5 font" id="staticBackdropLabel">Отправка жалобы</h1>
+            </div>
+            <form method="post" action="/report/{{ discuss.id }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div class="modal-body">
+                <p class="font">Причина</p>
+                <div style="margin-bottom: 20px;">
+                  <select class="form-select font-mine">
+                    <option selected value="indecent" class="font-mine">Неприличный пост</option>
+                    <option value="spam" class="font-mine">Спам или реклама</option>
+                    <option value="conf_info" class="font-mine">Конфиденциальная информация</option>
+                    <option value="offtopic" class="font-mine">Не по теме</option>
+                    <option value="agry" class="font-mine">Оскорбления</option>
+                    <option value="other" class="font-mine">Другое</option>
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn-glass btn-glass-outline font" data-bs-dismiss="modal">
+                  Отменить
+                </button>
+                <button type="submit" class="btn-glass btn-glass-primary font">Отправить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="discuss-custom">
+
+        <!-- Контент -->
+        <div
+          style="padding: 15px 0 5px 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+
+          <div class="d-flex flex-column ms-2 gap-1">
+            <a class="fw-bold fs-5 link-custom m-0" href="/discuss/{{ discuss.id }}">{{ discuss.title }}</a>
+            <div class="d-flex">
+              <!--Автор и дата-->
+              <a class="mb-0 link-custom text-secondary font-small font-mine" onclick="playSound()" href="/user/{{ author.id }}">
+                <img src="/static/avatars/{{ author.avatar }}" height="15" width="15"
+                  style="border-radius: 50%; margin-bottom: 0;">
+                {{ author.username }} • {{ time_ago(discuss.date) }}</a>
+            </div>
+          </div>
+
+          <div class="d-flex">
+
+            <!--Ответить/Лайк-->
+            {% if current_user.is_authenticated %}
+            <div class="d-flex align-items-center">
+              <form class="like-form" data-id="{{ discuss.id }}" data-type="discuss">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-unstyled button-custom px-2 like-button" title="Нравится">
+                  <img id="like-icon-{{ discuss.id }}" class="like-icon"
+                    src="/static/{% if discuss.liked %}like_filled.svg{% else %}like.svg{% endif %}">
+                  <span class="mt-2 text-reset font-mine">Нравится</span>
+                </button>
+              </form>
+              <a class="btn-unstyled text-secondary text-decoration-none button-custom px-2 font-mine reply-button"
+                href="/discuss/{{ discuss.id }}">
+                <img src="/static/reply.svg" class="reply-icon">
+                <span class="mt-2 text-reset font-mine">Ответить</span>
+              </a>
+              <a class="btn-unstyled text-secondary text-decoration-none button-custom px-2 font-mine report-button"
+                data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <img src="/static/report.svg" class="report-icon">
+                <span class="mt-2 text-reset font-mine">Жалоба</span>
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% endfor %}
+      {% else %}
+      <div class="nav col-auto mb-2 justify-content-center mb-md-0 p-2" style="margin-top: 80px;">
+        <p class="display-5 fw-bold"
+          style="background: linear-gradient(45deg, #6f42c1, #a855f7, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 4rem; user-select: none;">
+          У нас пока нет веток :(</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% if pagination.pages > 1 %}
+  <nav aria-label="Пример навигации по страницам" class="d-flex justify-content-center">
+    <ul class="pagination">
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('forum', page=pagination.prev_num) }}" aria-label="Предыдущая"><span
+            aria-hidden="true">&laquo;</span></a>
+      </li>
+      {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if page_num %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('forum', page=page_num) }}">{{ page_num }}</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">...</span></li>
+      {% endif %}
+      {% endfor %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('forum', page=pagination.next_num) }}" aria-label="Следующая"><span
+            aria-hidden="true">&raquo;</span></a>
+      </li>
+      <p>...</p>
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('forum', page=pagination.pages) }}" aria-label="Следующая"><span
+            aria-hidden="true">&raquo;</span></a>
+      </li>
+    </ul>
+  </nav>
+</main>
+{% endif %}
+{% endblock %}
