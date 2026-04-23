@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Регистрация
+{% endblock %}
+
+{% block menu %}
+<li class="nav-item">
+    <a href="/register" class="nav-link-glass active">
+        <img src="/static/register.svg" style="margin-right: 5px; width: 18px; height: 18px;">
+        Регистрация
+        <span class="nav-indicator"></span>
+    </a>
+</li>
+{% endblock %}
+
+{% block main %}
+<main style="margin-top: 10rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="staticBackdropLabel" aria-hidden="true" {% if show_modal %} data-bs-show="true" {%
+                endif %}>
+                <div class="modal-dialog">
+                    <div class="modal-content" style="border-radius: 15px; background: rgba(10, 10, 20, 0.75);">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5 font" id="staticBackdropLabel">Мы отправили код на почту {{
+                                email }}
+                            </h1>
+                        </div>
+                        <form method="post" action="/register">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="modal-body">
+                                <!-- Код подтверждения -->
+                                <p class="font">Введите 6-значный код</p>
+                                <div style="margin-bottom: 20px;" class="input-div">
+                                    <input type="text" placeholder="6-значный код" name="verify_code"
+                                        class="input font">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn-glass btn-glass-outline font" data-bs-dismiss="modal">
+                                    Закрыть
+                                </button>
+                                <button type="submit" class="btn-glass btn-glass-primary font">Отправить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="col-12 col-md-8 col-lg-6 col-xl- d-flex flex-column align-items-center justify-content-center text-center">
+                <!-- Карточка входа -->
+                <div
+                    style="background: rgba(10, 10, 20, 0.75); backdrop-filter: blur(15px); border: 1px solid rgba(111, 66, 193, 0.3); border-radius: 30px; padding: 40px;">
+                    <!-- Заголовок -->
+                    <div class="text-center mb-4">
+                        <span class="font-classic ms-2"
+                            style="background: linear-gradient(45deg, #6f42c1, #a855f7, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2rem; user-select: none;">РЕГИСТРАЦИЯ</span>
+                    </div>
+                    <form method="POST" action="/send_email">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="d-flex flex-column gap-2">
+                            <div>
+                                <div class="input-div">
+                                    <img src="/static/username.svg"
+                                        style="width: 18px; height: 18px; margin-right: 10px; filter: brightness(0) invert(1); opacity: 0.7;">
+                                    <input type="text" id="username" name="username" class="font input"
+                                        placeholder="Имя пользователя" value="{{ username }}" required minlength="4">
+                                </div>
+                            </div>
+                            <div>
+                                <!-- Email -->
+                                <div class="input-div">
+                                    <img src="/static/user.svg"
+                                        style="width: 18px; height: 18px; margin-right: 10px; filter: brightness(0) invert(1); opacity: 0.7;">
+                                    <input type="text" id="email" name="email" class="font input" placeholder="Email"
+                                        required>
+                                </div>
+                            </div>
+
+                            <!-- Пароль -->
+                            <div>
+                                <div class="input-div">
+                                    <img src="/static/password.svg"
+                                        style="width: 18px; height: 18px; margin-right: 10px; filter: brightness(0) invert(1); opacity: 0.7;">
+                                    <input type="password" id="password" name="password" class="font input"
+                                        placeholder="Пароль" value="{{ password }}" required>
+                                    <button type="button" id="togglePassword" class="btn-unstyled"><img id="hide"
+                                            src="/static/view.svg"></button>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <!-- Кнопка входа -->
+                                <button type="submit" id="registerBtn"
+                                    class="btn-glass btn-glass-primary font d-inline-block justify-content-center mb-2">
+                                    Регистрация
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Ссылка на регистрацию -->
+                        <div style="text-align: center;" class="nav-item">
+                            <p style="color: rgba(255,255,255,0.6); margin-bottom: 15px;">Есть аккаунт?</p>
+                            <a href="/login" class="nav-link-glass font"
+                                style="display: inline-flex; align-items: center; padding: 12px 25px;">
+                                <img src="/static/login.svg"
+                                    style="margin-right: 8px; height: 18px; filter: brightness(0) invert(1);">
+                                Вход
+                                <span class="nav-indicator"></span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

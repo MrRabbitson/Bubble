@@ -16,11 +16,8 @@
         <div class="text-center d-flex justify-content-center">
             <div class="main-page-content p-3">
                 <div>
-                    <h3 class="mt-4 font">Приветствуем вас на Nexus MC!</h3>
-                    <span class="font-mine mt-2">Nexus MC - это место, на котором игроки Minecraft деляться своими
-                        мыслями и творениями!<br>
-                        Вы можете обсудить с другими пользователями различные темы, добавлять посты, или просто
-                        общаться.</span>
+                    <h3 class="mt-4 font">Приветствуем вас на Bubble!</h3>
+                    <span class="font-mine mt-2">Bubble ---------------------------------------------------------------------------------------------</span>
                     {%if current_user.is_authenticated%}
                     {%else%}
                     <div style="background-image: url(/static/img/background.png);
@@ -38,7 +35,7 @@
                         </div>
                     </div>
                     {%endif%}
-                    <h3 class="mt-4 font">Популярные посты:</h3>
+                    <h3 class="mt-4 font">Глобальный чат:</h3>
                     <div class="row g-3">
                         {% if posts|length > 0 %}
                         {% for post in posts %}
