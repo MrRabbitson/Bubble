@@ -427,8 +427,6 @@ def user(id):
     status = "Пользователь"
     if user.is_moderator:
         status = "Модератор"
-    elif user.is_checked:
-        status = "Проверенный"
     elif user.username == "Whyiok" or current_user.username == "Nexus":
         status = "Админ"
 

@@ -108,16 +108,6 @@
                         border-radius: 50%;" title="Модерация постов">
                 </a>
                 {% endif %}
-                <a data-bs-toggle="modal" data-bs-target="#postsModal" class="btn-glass btn-glass-outline font p-0
-                    dropdown" style="
-                        width: 44px;
-                        height: 44px;
-                        background-image: url(/static/add.svg);
-                        background-size: 20px;
-                        background-repeat: no-repeat;
-                        background-position: center;
-                        border-radius: 50%;" title="Добавить пост">
-                </a>
                 <div class="vr my-2"></div>
                 <li class="nav-item dropdown position-relative" style="overflow: visible;">
                     <button class="btn-glass btn-glass-outline font p-0" data-bs-toggle="dropdown"
@@ -206,73 +196,6 @@
         </nav>
     </header>
 
-    <button id="toggleSidebarBtn">☰</button>
-
-    <aside style="
-    position: fixed;
-    bottom: 0.5rem;
-    top: 5rem;
-    left: 0.5rem;
-    width: 100px;
-    background: rgba(10, 10, 20, 0.75);
-    backdrop-filter: blur(15px);
-    border-radius: 15px 0 15px   15px;
-    overflow-y: auto;
-    z-index: 900;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;" id="sidebar">
-
-        <!-- Верхняя часть с ссылками (занимает всё свободное место) -->
-        <div>
-            <div class="dropdown my-2">
-                <button
-                    class="btn-glass btn-glass-primary dropdown-toggle font mx-auto d-flex align-items-center justify-content-center"
-                    style="width: 10rem;" type="button" data-bs-toggle="collapse" href="#categories">
-                    Категории
-                </button>
-                <ul class="collapse mt-3 mx-auto" id="categories">
-                    <li><a class="dropdown-item" href="#">Строительство</a></li>
-                    <li><a class="dropdown-item" href="#">PvP</a></li>
-                    <li><a class="dropdown-item" href="#">Редстоун</a></li>
-                    <li><a class="dropdown-item" href="#">Челленджи</a></li>
-                </ul>
-            </div>
-
-            <div class="dropdown my-2">
-                <button
-                    class="btn-glass btn-glass-outline dropdown-toggle font mx-auto d-flex align-items-center justify-content-center"
-                    style="width: 10rem;" type="button" data-bs-toggle="collapse" href="#tutors">
-                    Туториалы
-                </button>
-                <ul class="collapse mt-3 mx-auto" id="tutors">
-                    <li><a class="dropdown-item" href="#">Моддинг</a></li>
-                    <li><a class="dropdown-item" href="#">Датапаки</a></li>
-                    <li><a class="dropdown-item" href="#">Ресурспаки</a></li>
-                    <li><a class="dropdown-item" href="#">Плагины</a></li>
-                </ul>
-            </div>
-
-            <div class="dropdown my-2">
-                <button
-                    class="btn-glass btn-glass-primary dropdown-toggle font mx-auto d-flex align-items-center justify-content-center"
-                    style="width: 10rem;" type="button" data-bs-toggle="collapse" href="#teories">
-                    Теории
-                </button>
-                <ul class="collapse mt-3 mx-auto" id="teories">
-                    <li><a class="dropdown-item" href="#">Звуки</a></li>
-                    <li><a class="dropdown-item" href="#">Мобы</a></li>
-                    <li><a class="dropdown-item" href="#">Постройки</a></li>
-                    <li><a class="dropdown-item" href="#">???</a></li>
-                </ul>
-            </div>
-            {% if current_user.is_banned %}
-            <a>Вы забанены!</a>
-            {% endif %}
-        </div>
-    </aside>
-
-
     <main>
         {% block main %}
         {% endblock %}
@@ -301,10 +224,7 @@
                 <a href="#" style="text-decoration: none; color: rgba(255,255,255,0.7);">Разработчикам</a>
                 <a href="https://t.me/nexus_mcgg" style="text-decoration: none; color: rgba(255,255,255,0.7);">Наш
                     телеграмм</a>
-                <a style="color: rgba(255,255,255,0.5);">© 2026 Nexus</a>
-                <a style="color: rgba(255,255,255,0.5);">Nexus MC не связан с Mojang Studios или Microsoft.
-                    Minecraft является торговой маркой Mojang Studios.
-                </a>
+                <a style="color: rgba(255,255,255,0.5);">© 2026 Bubble</a>
             </div>
         </div>
     </footer>
