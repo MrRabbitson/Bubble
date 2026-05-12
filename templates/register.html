@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация - Bubble{% endblock %}
+
+{% block main %}
+<style>
+    .auth-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        position: relative;
+    }
+    
+    .auth-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image: url('/static/bg.svg');
+        background-repeat: no-repeat;
+        background-position: center top;
+        background-size: cover;
+    }
+    
+    .auth-card {
+        max-width: 450px;
+        width: 100%;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .auth-logo-icon {
+        font-size: 2.5rem;
+        color: var(--primary);
+        text-shadow: 0 0 20px var(--primary);
+    }
+    
+    .auth-logo-text {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-lighter);
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-lighter);
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-subtitle {
+        color: var(--text-muted);
+    }
+    
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .auth-footer {
+        margin-top: 1.5rem;
+        text-align: center;
+        color: var(--text-muted);
+    }
+    
+    .auth-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="auth-bg"></div>
+
+<div class="auth-section">
+    <div class="auth-card">
+        <div class="liquid-glass-card animate-fadeInUp">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="auth-logo-icon"><i class="fas fa-comments"></i></div>
+                    <div class="auth-logo-text">Bubble</div>
+                </div>
+                <h1 class="auth-title">Создать аккаунт</h1>
+                <p class="auth-subtitle">Присоединяйся к нашему сообществу!</p>
+            </div>
+            
+            <form method="post" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Имя пользователя</label>
+                    <input type="text" name="username" class="liquid-glass-input" required autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email (необязательно)</label>
+                    <input type="email" name="email" class="liquid-glass-input" autocomplete="email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" name="password" class="liquid-glass-input" required autocomplete="new-password">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Подтвердите пароль</label>
+                    <input type="password" name="confirm_password" class="liquid-glass-input" required autocomplete="new-password">
+                </div>
+                
+                <button type="submit" class="liquid-glass-btn" style="width: 100%;">
+                    <i class="fas fa-user-plus" style="margin-right: 0.5rem;"></i>
+                    Создать аккаунт
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Bubble - Где ваше сообщество живет{% endblock %}
+
+{% block main %}
+<style>
+    .hero-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        position: relative;
+    }
+    
+    .hero-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image: url('/static/bg.svg');
+        background-repeat: no-repeat;
+        background-position: center top;
+        background-size: cover;
+    }
+    
+    .hero-content {
+        text-align: center;
+        max-width: 800px;
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .hero-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-logo-icon {
+        font-size: 4rem;
+        color: var(--primary);
+        text-shadow: 0 0 30px var(--primary);
+    }
+    
+    .hero-logo-text {
+        font-size: 4rem;
+        font-weight: 800;
+        color: var(--text-lighter);
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-lighter);
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        margin-bottom: 3rem;
+        line-height: 1.6;
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-logo-text {
+            font-size: 2.5rem;
+        }
+        .hero-logo-icon {
+            font-size: 2.5rem;
+        }
+        .hero-title {
+            font-size: 2rem;
+        }
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="hero-bg"></div>
+
+
+<div class="hero-section">
+    <div class="hero-content">
+        <div class="liquid-glass-card animate-fadeInUp">
+        <div class="hero-logo">
+            <div class="hero-logo-icon"><i class="fas fa-comments"></i></div>
+            <div class="hero-logo-text">Bubble</div>
+        </div>
+        
+        <h1 class="hero-title">Где ваше сообщество живет</h1>
+        
+        <p class="hero-subtitle">
+            Место, где вы можете общаться с друзьями, обмениваться сообщениями и просто быть собой.
+        </p>
+        
+        <div class="hero-buttons">
+            <a href="{{ url_for('login') }}" class="liquid-glass-btn">
+                <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+                Войти
+            </a>
+            <a href="{{ url_for('register') }}" class="liquid-glass-btn liquid-glass-btn-secondary">
+                <i class="fas fa-user-plus" style="margin-right: 0.5rem;"></i>
+                Регистрация
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

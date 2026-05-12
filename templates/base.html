@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Bubble{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="liquid-notification {{ category }} show" id="notification-{{ loop.index }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% block main %}{% endblock %}
+    
+    <script>
+        setTimeout(() => {
+            const notifications = document.querySelectorAll('.liquid-notification');
+            notifications.forEach(notif => {
+                notif.classList.remove('show');
+                setTimeout(() => notif.remove(), 300);
+            });
+        }, 4000);
+    </script>
+</body>
+</html>
